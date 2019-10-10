@@ -1,0 +1,46 @@
+float Circle(vec2 uv, vec2 p, float r, float blur){
+ 	float d = length(uv-p);   
+    float c = smoothstep(r,r-blur,d);
+    return c;
+}
+
+float Mouth(vec2 uv, vec2 p, float r, float blur){
+ 	float mouth_cima = Circle(uv, p+vec2(0.0, 0.1), r, blur); //boca cima
+    mouth_cima *=      Circle(uv, p, r, blur); //boca interseção 
+    float mouth =      Circle(uv, p, r, blur);// boca baixo
+    mouth_cima -=  mouth;
+    
+    return mouth_cima;
+}
+
+float Smiley(vec2 uv, vec2 p, float size, float blur){
+    uv -= p;
+    uv /= size; 
+        
+    float mask = Circle(uv, vec2(0.), .4, blur); //rosto
+    
+    mask -= Circle(uv, vec2(-.13, .2), .07, blur);//olho
+    mask -= Circle(uv, vec2(.13, .2), .07, blur);//olho
+     
+    
+    mask += Mouth(uv, vec2(0.0, 0.0), .3, blur);
+    
+    return mask;
+}
+
+// main
+void mainImage( out vec4 fragColor, in vec2 fragCoord ) {
+	vec2 uv = fragCoord.xy / iResolution.xy;
+    
+    uv -=.5; 
+    uv.x *= iResolution.x / iResolution.y;    
+     
+    vec3 col = vec3(0.);    
+    
+	float mask = 0.;
+    mask =  Smiley(uv, vec2(0.,0.), .5, .02);
+    
+    col += vec3(1., 1., 1.)*mask;
+    
+	fragColor = vec4(col, 1.0);
+}
