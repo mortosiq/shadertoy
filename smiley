@@ -1,3 +1,5 @@
+// compille in https://www.shadertoy.com/new
+
 float Circle(vec2 uv, vec2 p, float r, float blur){
  	float d = length(uv-p);   
     float c = smoothstep(r,r-blur,d);
